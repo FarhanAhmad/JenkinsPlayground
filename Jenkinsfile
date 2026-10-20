@@ -10,7 +10,7 @@ pipeline {
         stage('run') {
             steps {
                 echo 'Running the compiled Java code.'
-                sh 'java Hello'
+                sh 'java prag'
                 sh 'python3 pipeline.py'
             }
         }
