@@ -1,1 +1,1 @@
-print('Hello')
+print('Hello after adding a trigger')
