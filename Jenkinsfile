@@ -9,12 +9,9 @@ pipeline {
         }
         stage('run') {
             steps {
-                echo 'Run python source code'
-                sh 'python3 pipeline.py'
-            }
-            steps {
                 echo 'Running the compiled Java code.'
                 sh 'java Hello'
+                sh 'python3 pipeline.py'
             }
         }
     }
