@@ -40,13 +40,13 @@ pipeline {
       <password>$NEXUS_CREDS_PSW</password>
     </server>
   </servers>
-  <mirrors>
-    <mirror>
-      <id>nexus-public</id>
-      <mirrorOf>*</mirrorOf>
-      <url>$NEXUS_BASE/repository/maven-public/</url>
-    </mirror>
-  </mirrors>
+  //<mirrors>
+    //<mirror>
+    //  <id>nexus-public</id>
+    //  <mirrorOf>*</mirrorOf>
+    //  <url>$NEXUS_BASE/repository/maven-public/</url>
+    //</mirror>
+  //</mirrors>
 </settings>
 XML
           chmod 600 settings.xml
