@@ -23,37 +23,37 @@ pipeline {
     }
 
     stage('Write Maven settings.xml (safe)') {
-      steps {
-        // Use heredoc so $NEXUS_CREDS_USR / $NEXUS_CREDS_PSW expand in the shell
-        sh '''
-          cat > settings.xml <<XML
+  steps {
+    sh '''
+      cat > settings.xml.template <<'XML'
 <settings>
   <servers>
     <server>
       <id>nexus-releases</id>
-      <username>$NEXUS_CREDS_USR</username>
-      <password>$NEXUS_CREDS_PSW</password>
+      <username>{{NEXUS_USER}}</username>
+      <password>{{NEXUS_PASS}}</password>
     </server>
     <server>
       <id>nexus-snapshots</id>
-      <username>$NEXUS_CREDS_USR</username>
-      <password>$NEXUS_CREDS_PSW</password>
+      <username>{{NEXUS_USER}}</username>
+      <password>{{NEXUS_PASS}}</password>
     </server>
   </servers>
   <mirrors>
     <mirror>
       <id>nexus-public</id>
       <mirrorOf>*</mirrorOf>
-      <url>$NEXUS_BASE/repository/maven-public/</url>
+      <url>{{NEXUS_BASE}}/repository/maven-public/</url>
     </mirror>
   </mirrors>
 </settings>
 XML
-          chmod 600 settings.xml
-          cat settings.xml
-        '''
-      }
-    }
+      sed -i "s|{{NEXUS_USER}}|${NEXUS_CREDS_USR}|g; s|{{NEXUS_PASS}}|${NEXUS_CREDS_PSW}|g; s|{{NEXUS_BASE}}|${NEXUS_BASE}|g" settings.xml.template
+      mv settings.xml.template settings.xml
+      chmod 600 settings.xml
+    '''
+  }
+}   
 
     stage('Build & Publish (deploy)') {
       steps {
