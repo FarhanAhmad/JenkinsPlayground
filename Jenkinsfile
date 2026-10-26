@@ -38,6 +38,11 @@ pipeline {
       <username>{{NEXUS_USER}}</username>
       <password>{{NEXUS_PASS}}</password>
     </server>
+    <server>
+      <id>nexus-public</id>         
+      <username>{{NEXUS_USER}}</username>
+      <password>{{NEXUS_PASS}}</password>
+    </server>
   </servers>
   <mirrors>
     <mirror>
