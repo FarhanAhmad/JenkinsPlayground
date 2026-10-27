@@ -1,35 +1,101 @@
 pipeline {
-    agent any
-    stages {
-        stage('Test') {
-            steps {
-                sh 'mvn -f hello-app/pom.xml test'
-            }
-            post {
-                always {
-                    junit 'hello-app/target/surefire-reports/*.xml'
-                }
-            }
+
+    agent {
+
+        kubernetes {
+
+            cloud 'eks-dynamic-agents'
+
+            namespace 'jenkins-agents'
+
+            yaml '''
+
+apiVersion: v1
+
+kind: Pod
+
+spec:
+
+  containers:
+
+    - name: maven
+
+      image: maven:3.9.9-eclipse-temurin-17
+
+      command: ["sleep"]
+
+      args: ["99d"]
+
+      tty: true
+
+      resources:
+
+        requests:
+
+          cpu: "500m"
+
+          memory: "1Gi"
+
+        limits:
+
+          memory: "2Gi"
+
+'''
+
         }
-        stage('build') {
-            steps {
-                echo 'Compiling the Java source code'
-                sh 'javac prag.java'
-                sh 'mvn -f hello-app/pom.xml -B -DskipTests clean package'
-            }
-            post {
-                success {
-                    echo "Now Archiving the Artifacts....."
-                    archiveArtifacts artifacts: '**/*.jar'
-                }
-            }
-        }
-        stage('run') {
-            steps {
-                echo 'Running the compiled Java code.'
-                sh 'java prag'
-                sh 'python3 pipeline.py'
-            }
-        }
+
     }
+
+    stages {
+
+        stage('Checkout') {
+
+            steps {
+
+                git branch: 'k8s-agent', url: 'https://github.com/FarhanAhmad/JenkinsPlayground.git'
+
+            }
+
+        }
+
+        stage('Build') {
+
+            steps {
+
+                container('maven') {
+
+                    sh 'mvn -B clean package'
+
+                }
+
+            }
+
+        }
+
+        stage('Verify Artifact') {
+
+            steps {
+
+                container('maven') {
+
+                    sh 'ls -lh target/*.jar'
+
+                }
+
+            }
+
+        }
+
+        stage('Archive Artifact') {
+
+            steps {
+
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+
+            }
+
+        }
+
+    }
+
 }
